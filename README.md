@@ -913,3 +913,44 @@ class ProvidersController extends Controller {
 }
 ```
 
+
+
+## Validação de dados do Request
+
+Para validar os dados que vêm do Request, visto que, caso o dado não possa ir como `null` para o banco de dados, usamos o método `validate()` que espera um array associativo de validação;
+
+```php
+class ProvidersController extends Controller {
+    public function save(Request $request) {
+        $request->validate([
+
+        ]);
+    }
+}
+```
+
+Esse array vai receber como _key_ o name do input e o valor vai ser as validações
+
+```php
+class ProvidersController extends Controller {
+    public function save(Request $request) {
+        $request->validate([
+            'name' => 'required',
+        ]);
+    }
+}
+```
+
+As regras que podem ser aplicadas como value do array assoc, podem ser encontradas [clicando aqui.](https://laravel.com/docs/9.x/validation#available-validation-rules)
+
+Agora, quando usarmos a rota o método `save()` em alguma rota de POST, o Laravel vai retornar para a mesma rota, porém, enviando erros na variavel `$errors`.
+
+### Metodo old()
+
+Como o laravel retorna para a rota que chamou o controlador que continha o metodo `validate()` com os dados da váriavel `$errors` contendo as mensagens das validações, todos os possiveis campos que passaram pela validação estão apagados, isso é uma má experiencia para o usuário ter de digitar novamente tudo que ele digitou antes. Para que isso não aconteca, no formulário, precisamos _setar_ na propriedade `value` dos input's o valor da váriavel `old()`, que vai esperar como parametro o `name` do input para retornar o último valor daquele input.
+
+```html
+<input type="text" value="{{ old('name') }}" name="name" placeholder="Nome">
+```
+
+Assim, o Laravel vai entender que, quando ele recarregar a página com o retorno das validações, vai saber que deve repopular aquele input com os dados do último request.
