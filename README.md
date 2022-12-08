@@ -829,4 +829,87 @@ class ProviderSeeder extends Seeder{
 
 Por fim, basta executar `php artisan db:seed --class=ProviderSeeder` para que os registros sejam inseridos no banco.
 
+## Request
+
+Todas as vezes que acessamos uma rota, o navegador manda uma requisição para a rota especificada e está rota por sua vez passa essa informação para o Controller responsável, onde o mesmo pode receber essa informação pela passagem de parametro da função
+
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+
+    }
+}
+```
+
+Podemos capturar os dados vindo de um método POST de um formulário, usando o método `all()`, trazendo em forma de array associativo os dados vindo do formulário, sendo a key os valores inseridos nos `name` dos input e o valor, sendo o que foi passado enviado propriamente dito no formulário.
+
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        print_r($request->all());
+    }
+}
+```
+
+Podemos capturar um dado especifico desse array usando o método `input()` 
+
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        echo $request->input('email'); //vai retornar o valor do input de name email
+    }
+}
+```
+
+Sendo assim, podemos inserir os dados vindos do formulário no banco de dados. Para isso, teremos que trazer para o contexto da classe `ProvidersController` o seu model correspondente, ou seja, `Provider` e instanciar o objeto do mesmo.
+
+```php
+use \App\Models\Provider;
+
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        $provider = new Provider();
+
+        $provider->name = $request->input('name');
+        $provider->save(); // método save para persistir a alteração no banco de dados.
+    }
+}
+```
+
+Podemos usufruir da facilidade do método `fill()` em conjunto do método `all()`, visto que o método `all()` retorna um array associativo dos valores do formulário. Isso só sera possivel se o nome das colunas forem os mesmo dos `name` no formulário HTML
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        $provider = new Provider();
+        $provider->fill($request->all())->save();
+    }
+}
+```
+
+Também, podemos usar o método `create()` no lugar do metodo `fill()`
+
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        $provider = new Provider();
+        $provider->create($request->all())->save();
+    }
+}
+```
+
+Ou caso queria encurtar ainda mais, não precisando da instanciação do objeto, usando de forma estática o metodo `create()`
+
+
+```php
+class ProvidersController extends Controller {
+    public function index(Request $request) {
+        Provider::create($request->all())->save();
+    }
+}
+```
 
