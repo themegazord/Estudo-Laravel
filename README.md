@@ -115,6 +115,11 @@ php artisan db:seed
 php artisan db:seed --class=nome_da_classe_seeder
 ```
 
+### Criar uma factory
+```shell
+php artisan make:factory nome_da_factory --model=nome_da_model
+```
+
 <hr>
 
 ## Routes
@@ -783,7 +788,7 @@ class ProviderSeeder extends Seeder {
 
 ```
 
-Após isso, devemos localizar o arquivo `DatabaseSeeder.php` localizado em `database\seeders` e dentro do método `run()` chamar a classe seeder que você criou
+Após isso, devemos localizar o arquivo `DatabaseSeeder.php` localizado em `database/seeders` e dentro do método `run()` chamar a classe seeder que você criou
 
 ```php
 class DatabaseSeeder extends Seeder {
@@ -796,6 +801,7 @@ class DatabaseSeeder extends Seeder {
 Uma vez chamado no arquivo `DatabaseSeeder`, basta executar o comando para rodar o seeder.
 
 Caso em algum momento, você insira outro seeder e não quer repopular seu banco de dados com as informações que você já inserir no passado, utilize o comando `php artisan db:seed nome_da_classe_seeder`
+
 
 ## Factories
 
@@ -828,6 +834,7 @@ class ProviderSeeder extends Seeder{
 ```
 
 Por fim, basta executar `php artisan db:seed --class=ProviderSeeder` para que os registros sejam inseridos no banco.
+
 
 ## Request
 
@@ -914,7 +921,6 @@ class ProvidersController extends Controller {
 ```
 
 
-
 ## Validação de dados do Request
 
 Para validar os dados que vêm do Request, visto que, caso o dado não possa ir como `null` para o banco de dados, usamos o método `validate()` que espera um array associativo de validação;
@@ -936,6 +942,21 @@ class ProvidersController extends Controller {
     public function save(Request $request) {
         $request->validate([
             'name' => 'required',
+        ]);
+    }
+}
+```
+
+Para realizar a alteração da mensagem de erro, basta inserir mais um array no metodo `validate()`, passando como _key_ [name_do_input].[validacao] 
+
+```php
+class ProvidersController extends Controller {
+    public function save(Request $request) {
+        $request->validate([
+            'name' => 'required',
+        ],
+        [
+            'name.required' => 'O campo nome é obrigatório',
         ]);
     }
 }
