@@ -797,4 +797,36 @@ Uma vez chamado no arquivo `DatabaseSeeder`, basta executar o comando para rodar
 
 Caso em algum momento, você insira outro seeder e não quer repopular seu banco de dados com as informações que você já inserir no passado, utilize o comando `php artisan db:seed nome_da_classe_seeder`
 
+## Factories
+
+Factories são uma forma de popular um banco de dados em massa usando seeders.
+
+As factories ficam em `database/factories`.
+
+Geralmente são utilizados dados _fakes_ para preenchimento e teste dos mesmo no banco de dados e para isso vamos usar dependencia `Faker` que vem como padrão dentro das factories, podendo ser acessado como uma propriedade da class extendida Factory.
+
+Ao criar a factory usando `php artisan make:factory nome_da_factory --model=nome_da_model` iremos preencher o precisamos dentro da classe criada no return do metodo `definition`.
+
+```php
+class ProviderFactory extends Factory {
+    public function definition() {
+        return [
+            'name' => $this->faker->name()
+        ];
+    }
+}
+```
+
+Uma vez preenchido a factory, devemos chamar ela com a função estática `factory()` do model hasFactory vindo lá do seu model dentro do seu respectivo seeder.
+
+```php
+class ProviderSeeder extends Seeder{
+    public function run() {
+        Provider::factory()->count(20)->create(); // count() vai definir quantas vezes essa seed vai ser implementada.
+    }
+}
+```
+
+Por fim, basta executar `php artisan db:seed --class=ProviderSeeder` para que os registros sejam inseridos no banco.
+
 
