@@ -120,6 +120,11 @@ php artisan db:seed --class=nome_da_classe_seeder
 php artisan make:factory nome_da_factory --model=nome_da_model
 ```
 
+### Criar um Middleware
+```shell
+php artisan make:middleware nome_do_middleware
+```
+
 <hr>
 
 ## Routes
@@ -975,3 +980,66 @@ Como o laravel retorna para a rota que chamou o controlador que continha o metod
 ```
 
 Assim, o Laravel vai entender que, quando ele recarregar a página com o retorno das validações, vai saber que deve repopular aquele input com os dados do último request.
+
+
+## Midllewares
+
+São camadas de softwares aplicadas entre aplicações distintes. Atuam na interceptação das requisição HTTP feita por browser e tambem na manipulação das respostas feitas para esss browsers.
+
+Para criar um middleware basta usar o comando `php artisan make:middleware nome_do_middleware` e ele será criado no diretório `app\Http\Middleware`
+
+Dentro do Middleware, a função que vai ser chamada assim que o middleware for acionado vai ser a `handle(Request $request, Closure $next)`
+
+```php
+class LogAccessMiddleware {
+    public function handle(Request $request, Closure $next) {
+        return $next($request);
+    }
+}
+```
+
+Os middlewares podem ser usados tanto em rotas quanto em controllers, por agora, iremos falar dentro das rotas.
+
+Nas rotas, devemos trazer para o contexto do `web.php` a classe do middleware. Em seguida, temos que inserir o middlare na rota e podemos fazer isso de qualquer forma, porém, a que me faz mais sentido e inserir o middleware como 'função estatica' de `Route`
+
+```php
+use \App\Http\Middleware\LogAccessMiddleware;
+use \App\Http\Controllers\HomeController;
+
+Route::middleware(LogAccessMiddleware::class)
+    ->get('/', [HomeController::class, 'principal'])
+    ->name('site.index');
+```
+
+Dessa forma faz mais sentido, visto que, antes de acessar de fato o controller, a requisição vai passar pelo middleware.
+
+
+Para utilizar o Middleware em contexto de Controller, devemos inserir no construtor do Controller, no método `$this->middleware()`
+
+```php
+use App\Http\Middleware\LogAccessMiddleware;
+
+class AboutController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware(LogAccessMiddleware::class);
+    }
+}
+```
+
+Podemos fazer com que todos as rotas sejam web ou api utilizem o mesmo middleware sempre, basta inserir na propriedade `$middlewareGroups` do classe `Kernel`, localizado em `App/Http/Kernel.php`
+
+```php
+
+class Kernel extends HttpKernel {
+    protected $middlewareGroups = [
+        web => [
+            ...,
+            \App\Http\Middleware\LogAccessMiddleware::class,
+        ]   
+    ]
+}
+```
+
+Assim todas as rotas web passaram a usar esse middleware sempre que forem requisitadas.
