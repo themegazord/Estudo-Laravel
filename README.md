@@ -997,6 +997,7 @@ class LogAccessMiddleware {
     }
 }
 ```
+### Middlewares em Rotas
 
 Os middlewares podem ser usados tanto em rotas quanto em controllers, por agora, iremos falar dentro das rotas.
 
@@ -1013,7 +1014,7 @@ Route::middleware(LogAccessMiddleware::class)
 
 Dessa forma faz mais sentido, visto que, antes de acessar de fato o controller, a requisição vai passar pelo middleware.
 
-
+### Middleware em Controllers
 Para utilizar o Middleware em contexto de Controller, devemos inserir no construtor do Controller, no método `$this->middleware()`
 
 ```php
@@ -1027,7 +1028,7 @@ class AboutController extends Controller
     }
 }
 ```
-
+### Universalidade dos Middlewares
 Podemos fazer com que todos as rotas sejam web ou api utilizem o mesmo middleware sempre, basta inserir na propriedade `$middlewareGroups` do classe `Kernel`, localizado em `App/Http/Kernel.php`
 
 ```php
@@ -1043,3 +1044,46 @@ class Kernel extends HttpKernel {
 ```
 
 Assim todas as rotas web passaram a usar esse middleware sempre que forem requisitadas.
+
+### Nomeando Middlewares
+
+Para nomear middlewares, precisamos inseri-lo dentro da variavel array `protected $routeMiddleware`, onde, como _key_ iremos inserir o apelido do Middleware, e seu _value_ sera a classe do middleware propriamente dita.
+
+````php
+class Kernel extends HttpKernel {
+    protected $routeMiddleware = [
+        ...,
+        'log.access' => \App\Http\Middleware\LogAccessMiddleware::class,
+    ]
+}
+````
+
+Agora, tanto nas rotas quanto nos controladores, podemos apenas passar o apelido do middleware dentro do método `middleware()`.
+
+- Route
+    ````php
+    Route::get('/about', [AboutController::class, 'about'])->name('site.about')->middleware('log.access');
+    ````
+- Controller
+    ````php
+    class AboutController extends Controller {
+        public function __construct() { $this->middleware('log.access') }
+    }   
+    ````
+
+### Passando parametros para os Middlewares
+
+Caso seja necessário, podemos passar parametros para os middleware, inserindo um prefixo na chamado do middleware `:[params]`, separando-os por virgulas e capturando eles como parametros da função `handle().`
+
+- Route
+```php
+    Route::get('/about', [AboutController::class, 'about'])->name('site.about')->middleware('log.access:param1, paramm2');
+```
+- Middleware
+```php
+    class LogAccessMiddleware {
+        public function handle ($request, $next, $param1, $param2){
+            
+        }
+    }
+```
