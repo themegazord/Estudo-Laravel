@@ -56,6 +56,12 @@ php artisan up
 php artisan make:controller nome_do_controller
 ```
 
+### Criando Controllers com Resourcs
+
+```shell
+php artisan make:controller -r ou --resource nome_do_controller
+```
+
 ### Criando Models
 
 ```shell
@@ -218,6 +224,25 @@ Route::fallback(function() {
 })
 ```
 
+### Criando rotas com controladores resource
+
+Laravel disponibiliza uma forma mais agradavel de se trabalhar as rotas que contenham controladores que foram criados com resource.
+
+```php
+Route::resource('name_da_rota', 'name_do_controller');
+```
+
+Ao fazer isso, o Laravel gerencia as rotas sozinho, fazendo com que você não precise criar varias linhas de codigo para separar todos os metodos do Controller
+
+```php
+Route::resource('product', ProductController::class);
+```
+
+Ao dar o comando `php artisan route:list` vemos isso nas rotas de `product`
+
+![](https://i.ibb.co/JFqGV45/route-resource.png)
+
+
 ## Controller
 
 ### Passando parametros do Controller para a View.
@@ -251,6 +276,19 @@ public function index($p1, $p2) {
     return view('site.contact', compact('p1', 'p2'));
 }
 ```
+
+### Criando Controllers com resources
+
+Ao utilizar o comando `php artisan make:controller -r nome_do_controller` é criado um controlador com métodos que são seguidos por boas práticas de programação. São esses:
+
+- ``index()`` -> Exibir a lista de registros
+- ``create()`` -> Exibir formulários de criação do registro
+- ``store()`` -> Recebe o formulário de criação do registro
+- ``show()`` -> Exibe registro especifico
+- ``edit()`` -> Exibir formulário de edição do registro
+- ``update()`` -> Receber formulário de edição do registro
+- ``destroy()`` -> Receber dados para remoção do registro
+
 
 ## Migrations
 
