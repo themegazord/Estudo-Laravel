@@ -625,6 +625,71 @@ Equivalente a
 SELECT * FROM providers ORDER BY id ASC
 ```
 
+### Relacionamento 1 x 1 dentro do Eloquent ORM
+
+#### hasOne()
+
+Com o `hasOne($related, $foreingKey, $localKey)` podemos dizer para o eloquent que tal tabela mãe tem um relacionamento de 1 x 1 com outra tabela.
+* `$related` -> A model da tabela onde a PK é um FK.
+* `$foreingKey` -> O nome explicito da foreign key, aconselha-se utilizar, visto que poder _default_ o Eloquent ORM vai passar como parametro de busca uma coluna com `[nome-da-coluna-mae]-id`, caso sua coluna seja diferente disso, passe esse parametro
+* `$localKey` -> O nome da PK, por _default_ o Eloquent ORM vai utilizar a coluna com nome `id` da tabela mãe.]
+
+Para utilizar o `hasOne()`, dentro do model da tabela mãe, cria-se uma `public function()` com o nome da tabela filha (por convenção, use o nome que desejar).
+
+```php
+class Product extends Model{
+    ...
+    public function detailproduct() {
+        
+    }
+}
+```
+
+E dentro dessa função, atraves do retorno do metodo `this()`, utilize o método `hasOne()`
+
+```php
+use App\Models\DetailProduct;
+class Product extends Model{
+    ...
+    public function detailproduct() {
+        return $this->hasOne(DetailProduct::class, 'id_product')
+    }
+}
+```
+
+Agora, quando for utilizar, basta chamar `detailproduct()` como um metodo da classe `Product` e em seguida chamar a propriedade de `DetailProduct`;
+
+```html
+    <td>{{$product->detailproduct->length ?? ''}}</td>
+    <td>{{$product->detailproduct->height ?? ''}}</td>
+    <td>{{$product->detailproduct->width ?? ''}}</td>
+```
+
+#### belongsTo()
+
+É o processo inverso do `hasOne()`, se o `hasOne()`é um referenciamento do mais forte para o mais fraco, o `belongsTo()` é do mais fraco para o mais forte.
+
+Mesmo esquema de parametros do `hasOne()`
+
+* `$related` -> A model da tabela onde a PK é um FK.
+* `$foreingKey` -> O nome explicito da foreign key, aconselha-se utilizar, visto que poder _default_ o Eloquent ORM vai passar como parametro de busca uma coluna com `[nome-da-coluna-mae]-id`, caso sua coluna seja diferente disso, passe esse parametro
+* `$localKey` -> O nome da PK, por _default_ o Eloquent ORM vai utilizar a coluna com nome `id` da tabela mãe.
+
+```php
+use App\Models\Product;
+class DetailProduct extends Model{
+    ...
+    public function product() {
+        return $this->belongsTo(Product::class, 'id_product');
+    }
+}
+```
+
+Usano ficaria
+
+```html
+<span>Nome: {{$detailproduct->product->name}}</span>
+```
 
 ## Collections
 
