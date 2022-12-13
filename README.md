@@ -691,6 +691,67 @@ Usano ficaria
 <span>Nome: {{$detailproduct->product->name}}</span>
 ```
 
+### Relacionamento 1 x N dentro do Eloquent ORM
+
+#### hasMany()
+
+Quando o relacionamento é 1 x N, por lógica, receberemos varios valores vinculados a uma única entidade, por isso usamos ``hasMany()``, contém os mesmo parametros que o `hasOne()`
+
+* `$related` -> A model da tabela onde a PK é um FK.
+* `$foreingKey` -> O nome explicito da foreign key, aconselha-se utilizar, visto que poder _default_ o Eloquent ORM vai passar como parametro de busca uma coluna com `[nome-da-coluna-mae]-id`, caso sua coluna seja diferente disso, passe esse parametro
+* `$localKey` -> O nome da PK, por _default_ o Eloquent ORM vai utilizar a coluna com nome `id` da tabela mãe.
+
+```php
+use \App\Models\Product;
+
+class Provider extends Model {
+    ...
+    public function products() {
+        return $this->hasMany(Product::class, 'id_provider');
+    }
+}
+```
+
+Note que diferente do `hasOne()` foi utilizado o no nome da função em plural, visto que, o `hasMany()` poderá trazer 1 ou mais objetos do banco de dados.
+Quando for utilizado, deverá dentro do `foreach()` do pai, ser chamado em outro `foreach()`
+
+```html
+@foreach($providers as $provider)
+                            <tr>
+                                <td>{{$provider->id}}</td>
+                                <td>{{$provider->name}}</td>
+                                <td>{{$provider->site}}</td>
+                                <td>{{$provider->uf}}</td>
+                                <td>{{$provider->email}}</td>
+                                <td><a href="{{route('app.providers.delete', $provider->id)}}">Excluir</a></td>
+                                <td><a href="{{route('app.providers.edit', $provider->id)}}">Editar</a></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">
+                                    <p>Lista de Produtos</p>
+                                    <table border="1" style="margin: 20px;">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($provider->products as $key => $product)
+                                            <tr>
+                                                <td>{{$product->id}}</td>
+                                                <td>{{$product->name}}</td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        @endforeach
+```
+
+<blockquote>Observação:. Por favor, ignorem os metodos ultrapassados de manuseio de tabela e os estilos inline, o objetivo é demostrar a usabilidade do método e não o frontend :) </blockquote>
+
 ## Collections
 
 ### Metodos
