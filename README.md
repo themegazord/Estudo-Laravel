@@ -752,6 +752,42 @@ Quando for utilizado, deverá dentro do `foreach()` do pai, ser chamado em outro
 
 <blockquote>Observação:. Por favor, ignorem os metodos ultrapassados de manuseio de tabela e os estilos inline, o objetivo é demostrar a usabilidade do método e não o frontend :) </blockquote>
 
+### Relacionamento N x N com Eloquent ORM
+
+#### belongsToMany()
+
+O metodo `belongsToMany($related, $table, $foreignPivotKey, $relatedPivotKey)` é utilizando em relacionamentos N x N para junção de várias tabelas
+
+* $related -> O nome do model que a relação N x N foi estabelicida com o model atual
+* $table -> O nome da tabela intermediaria que representa o relacionamento
+* $foreignPivotKey -> O nome da FK na tabela intermediaria que se relaciona com a PK do  model atual
+* $relatedPivotKey -> O nome da FK na tabela intermediaria que se relaciona com a PK do modelo relacionado
+
+Um exemplo de uso do método `belongsToMany()` seria:
+
+```php
+public function tags()
+{
+    return $this->belongsToMany('App\Tag', 'post_tag', 'post_id', 'tag_id');
+}
+```
+
+Neste exemplo, o modelo `Post` tem um relacionamento de muitos para muitos com o modelo `Tag`, usando a tabela intermediária `post_tag`. A chave estrangeira `post_id` na tabela intermediária se relaciona com a chave primária do modelo `Post`, enquanto a chave estrangeira `tag_id` se relaciona com a chave primária do modelo `Tag`.
+
+#### withPivot
+
+O metodo `withPivot()` é usado para adicionar campos adicionais na tabela intermediária para o relacionamento. Por exemplo, caso queiramos pegar o valor da tabela `created_at` do banco de dados, além do `post_id` e `tag_id`, usamos o `withPivot()`
+
+````php
+public function tags()
+{
+    return $this->belongsToMany('App\Tag', 'post_tag', 'post_id', 'tag_id')
+                ->withPivot('created_at');
+}
+````
+
+O código acima vai retornar as mesmas coisas que o código usado na explicação do `belongsToMany()`, porém, também vai retornar o valor da coluna `created_at`.
+
 ## Collections
 
 ### Metodos
