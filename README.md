@@ -788,6 +788,32 @@ public function tags()
 
 O código acima vai retornar as mesmas coisas que o código usado na explicação do `belongsToMany()`, porém, também vai retornar o valor da coluna `created_at`.
 
+#### attach()
+
+O metodo `attach()` é usado para inserir valores num relacionamento N x N.
+
+````php
+        $order->products()->attach(
+            $request->get('id_product'),
+            [
+                'quantity' => $request->get('quantity'),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        );
+````
+
+Dentro do model ``Order`` eu tenho o método `belongsToMany` instaurado no método `products()`, consigo usar o attach para inserir dados diretos na tabela de relacionamento, sem precisar usar metodos como `fill()`, `create()` ou inserção direta nas propriedades do modelo intermediario
+
+
+#### detach()
+
+Elimina um dado da tabela intermediaria utilizando do id de uma das FK
+
+````php
+        $order->products()->detach($product->id);
+````
+
 ## Collections
 
 ### Metodos
